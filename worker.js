@@ -39,6 +39,7 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
 
   const har = {
     log: {
+      // TODO update the creator
       creator: { name: 'cloudflare worker', version: '0.0.0' },
       entries: [
         {
@@ -47,6 +48,7 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
           request: {
             method: req.method,
             url: req.url,
+            // TODO get http version correctly?
             httpVersion: '1.1',
             headers: [...req.headers].map(([name, value]) => {
               return { name, value }
@@ -77,4 +79,27 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
   };
 
   return { har, response: res };
+}
+
+module.exports.metrics = function readme(apiKey, group, req, har) {
+  return fetch('https://metrics.readme.io/request', {
+    method: 'POST',
+    headers: {
+      authorization: `Basic ${btoa(`${apiKey}:`)}`,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify([{
+      group,
+      clientIPAddress: req.headers.get('cf-connecting-ip'),
+      request: har,
+    }]),
+  })
+  .then(async (response) => {
+    console.log('Response from readme', response)
+    console.log(await response.text())
+  })
+  .catch(err => {
+    console.error('Error saving log to readme', err)
+    throw err;
+  })
 }

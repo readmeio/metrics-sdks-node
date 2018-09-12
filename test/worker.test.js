@@ -5,6 +5,7 @@ global.fetch = fetch;
 global.Request = Request;
 global.Response = Response;
 global.URL = URL;
+global.btoa = (str) => Buffer.from(str).toString('base64');
 
 /* eslint-env mocha */
 const express = require('express');
@@ -13,8 +14,6 @@ const nock = require('nock');
 const config = require('../config');
 
 const worker = require('../worker');
-
-const apiKey = 'OUW3RlI4gUCwWGpO10srIo2ufdWmMhMH';
 
 describe('worker', () => {
   before(() => {
@@ -59,10 +58,11 @@ describe('worker', () => {
       const { har } = await worker.fetchAndCollect(request);
 
       assert.deepEqual(har.log.creator, { name: 'cloudflare worker', version: '0.0.0' });
+      assert.equal(typeof har.log.entries[0].startedDateTime, 'string');
+      assert.equal(typeof har.log.entries[0].time, 'number');
       assert.deepEqual(har.log.entries[0].request, {
         method: request.method,
         url: request.url,
-        // TODO get http version correctly?
         httpVersion: '1.1',
         headers: [
           {
@@ -127,6 +127,38 @@ describe('worker', () => {
   });
 
   describe('#metrics()', () => {
-    it('should make a request to the metrics api');
+    it('should make a request to the metrics api', async () => {
+      const apiKey = 'OUW3RlI4gUCwWGpO10srIo2ufdWmMhMH';
+      const group = '5afa21b97011c63320226ef3';
+      const har = {
+        log: {
+          entries: [
+            {
+              request: {},
+              response: {},
+            },
+          ],
+        },
+      };
+
+      const mock = nock(config.host)
+        .post('/request', ([body]) => {
+          assert.equal(body.group, group);
+          assert.deepEqual(body.request, har);
+          return true;
+        })
+        .basicAuth({ user: apiKey })
+        .reply(200, 'OK');
+
+      const request = new Request('https://example.com', {
+        headers: {
+          'cf-connecting-ip': '127.0.0.1',
+        },
+      });
+
+      await worker.metrics(apiKey, group, request, har);
+
+      mock.done();
+    });
   });
 });
