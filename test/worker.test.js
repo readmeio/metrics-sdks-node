@@ -1,3 +1,4 @@
+/* eslint-env mocha */
 const { fetch, Request, Response } = require('fetch-ponyfill')();
 const { URL } = require('url');
 
@@ -5,10 +6,8 @@ global.fetch = fetch;
 global.Request = Request;
 global.Response = Response;
 global.URL = URL;
-global.btoa = (str) => Buffer.from(str).toString('base64');
+global.btoa = str => Buffer.from(str).toString('base64');
 
-/* eslint-env mocha */
-const express = require('express');
 const assert = require('assert');
 const nock = require('nock');
 const config = require('../config');
@@ -50,10 +49,14 @@ describe('worker', () => {
 
       nock('https://example.com')
         .post('/a?b=2', JSON.stringify({ c: 3, d: 4 }))
-        .reply(200, { response: true }, {
-          'content-type': 'application/json',
-          'x-response-header': 'hello',
-        });
+        .reply(
+          200,
+          { response: true },
+          {
+            'content-type': 'application/json',
+            'x-response-header': 'hello',
+          },
+        );
 
       const { har } = await worker.fetchAndCollect(request);
 
@@ -114,9 +117,13 @@ describe('worker', () => {
 
       nock('https://example.com')
         .post('/a?b=2', JSON.stringify({ c: 3, d: 4 }))
-        .reply(200, { response: true }, {
-          'x-response-header': 'hello',
-        });
+        .reply(
+          200,
+          { response: true },
+          {
+            'x-response-header': 'hello',
+          },
+        );
 
       const { response } = await worker.fetchAndCollect(request);
 
