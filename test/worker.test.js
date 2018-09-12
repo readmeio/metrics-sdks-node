@@ -22,6 +22,21 @@ describe('worker', () => {
   after(() => nock.cleanAll());
 
   describe('#fetchAndCollect()', () => {
+    it('should work for GET/HEAD requests (no body)', async () => {
+      const request = new global.Request('https://example.com/a?b=2', {
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
+      const mock = nock('https://example.com')
+        .get('/a?b=2')
+        .reply(200);
+
+      await worker.fetchAndCollect(request);
+      mock.done();
+    });
+
     it('should make the request provided', async () => {
       const request = new global.Request('https://example.com/a?b=2', {
         method: 'POST',
@@ -49,14 +64,10 @@ describe('worker', () => {
 
       nock('https://example.com')
         .post('/a?b=2', JSON.stringify({ c: 3, d: 4 }))
-        .reply(
-          200,
-          { response: true },
-          {
-            'content-type': 'application/json',
-            'x-response-header': 'hello',
-          },
-        );
+        .reply(200, 'response', {
+          'content-type': 'text/plain',
+          'x-response-header': 'hello',
+        });
 
       const { har } = await worker.fetchAndCollect(request);
 
@@ -91,7 +102,7 @@ describe('worker', () => {
         headers: [
           {
             name: 'content-type',
-            value: 'application/json',
+            value: 'text/plain',
           },
           {
             name: 'x-response-header',
@@ -99,11 +110,29 @@ describe('worker', () => {
           },
         ],
         content: {
-          text: JSON.stringify({ response: true }),
-          size: JSON.stringify({ response: true }).length,
-          mimeType: 'application/json',
+          text: 'response',
+          size: 'response'.length,
+          mimeType: 'text/plain',
         },
       });
+    });
+
+    it('should default mimeType to json if no content-type', async () => {
+      const request = new global.Request('https://example.com/a?b=2', {
+        method: 'POST',
+        headers: {
+          'content-type': '',
+        },
+      });
+
+      nock('https://example.com')
+        .post('/a?b=2')
+        .reply(200);
+
+      const { har } = await worker.fetchAndCollect(request);
+
+      assert.equal(har.log.entries[0].request.postData.mimeType, 'application/json');
+      assert.equal(har.log.entries[0].response.content.mimeType, 'application/json');
     });
 
     it('should return with a fresh response that can be read', async () => {

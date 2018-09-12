@@ -97,13 +97,16 @@ module.exports.metrics = function readme(apiKey, group, req, har) {
     ]),
   })
     .then(async response => {
+      /* istanbul ignore if */
       if (process.env.NODE_ENV !== 'testing') {
         console.log('Response from readme', response);
         console.log(await response.text());
       }
     })
-    .catch(err => {
-      if (process.env.NODE_ENV !== 'testing') console.error('Error saving log to readme', err);
-      throw err;
-    });
+    .catch(
+      /* istanbul ignore next */ err => {
+        if (process.env.NODE_ENV !== 'testing') console.error('Error saving log to readme', err);
+        throw err;
+      },
+    );
 };
