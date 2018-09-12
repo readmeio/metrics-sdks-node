@@ -1,4 +1,4 @@
-const request = require('r2');
+const fetch = require('node-fetch');
 const config = require('./config');
 
 const constructPayload = require('./lib/construct-payload');
@@ -47,14 +47,17 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       // this is fine for now
       queue.push(constructPayload(req, res, group, options, { startedDateTime }));
       if (queue.length >= bufferLength) {
-        request
-          .post(`${config.host}/request`, {
-            headers: { authorization: `Basic ${encoded}` },
-            json: queue,
-          })
-          .response.then(() => {
-            queue = [];
-          });
+        fetch(`${config.host}/request`, {
+          method: 'POST',
+          headers: {
+            authorization: `Basic ${encoded}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(queue),
+        })
+        .then(() => {
+          queue = [];
+        });
       }
 
       cleanup(); // eslint-disable-line no-use-before-define

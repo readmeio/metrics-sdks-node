@@ -1,5 +1,7 @@
 /* eslint-env mocha */
-const { fetch, Request, Response } = require('fetch-ponyfill')();
+const fetch = require('node-fetch');
+
+const { Request, Response } = fetch;
 const { URL } = require('url');
 
 global.fetch = fetch;
