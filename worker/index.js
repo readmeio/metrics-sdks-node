@@ -1,4 +1,5 @@
 /* eslint-env worker */
+/* global HOST, VERSION */
 
 async function getRequestBody(request) {
   if (request.method.match(/GET|HEAD/)) {
@@ -30,6 +31,20 @@ async function getResponseBody(response) {
   };
 }
 
+// These variables are replaced when the worker is
+// compiled via webpack using a DefinePlugin
+// it has been done this way to reduce the worker bundle
+// size and reduce the number of dependencies
+let version = 'node';
+let host = 'http://localhost';
+try {
+  version = VERSION;
+  host = HOST;
+} catch (e) {
+  // This should only be triggered from within a node
+  // environment, which is only during unit testing
+}
+
 module.exports.fetchAndCollect = async function fetchAndCollect(request) {
   const startedDateTime = new Date();
 
@@ -41,8 +56,7 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
 
   const har = {
     log: {
-      // TODO update the creator
-      creator: { name: 'cloudflare worker', version: '0.0.0' },
+      creator: { name: 'cloudflare-worker', version },
       entries: [
         {
           startedDateTime: startedDateTime.toISOString(),
@@ -82,7 +96,7 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
 
 module.exports.metrics = function readme(apiKey, group, req, har) {
   /* eslint-disable no-console */
-  return fetch('https://metrics.readme.io/request', {
+  return fetch(`${host}/request`, {
     method: 'POST',
     headers: {
       authorization: `Basic ${btoa(`${apiKey}:`)}`,

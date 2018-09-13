@@ -12,9 +12,9 @@ global.btoa = str => Buffer.from(str).toString('base64');
 
 const assert = require('assert');
 const nock = require('nock');
-const config = require('../config');
+const config = require('../../config');
 
-const worker = require('../worker');
+const worker = require('../../worker');
 
 describe('worker', () => {
   before(() => {
@@ -73,7 +73,7 @@ describe('worker', () => {
 
       const { har } = await worker.fetchAndCollect(request);
 
-      assert.deepEqual(har.log.creator, { name: 'cloudflare worker', version: '0.0.0' });
+      assert.deepEqual(har.log.creator, { name: 'cloudflare-worker', version: 'node' });
       assert.equal(typeof har.log.entries[0].startedDateTime, 'string');
       assert.equal(typeof har.log.entries[0].time, 'number');
       assert.deepEqual(har.log.entries[0].request, {
@@ -179,7 +179,7 @@ describe('worker', () => {
         },
       };
 
-      const mock = nock(config.host)
+      const mock = nock('http://localhost')
         .post('/request', ([body]) => {
           assert.equal(body.group, group);
           assert.deepEqual(body.request, har);
