@@ -16,7 +16,7 @@
     "prettier": "prettier --list-different \"./**/**.js\"",
     "pretest": "npm run lint && npm run inspect && npm run prettier",
     "test": "nyc mocha",
-    "posttest": "nyc report --reporter=lcov && nyc check-coverage --statements 95 --branches 95 --functions 95 --lines 95"
+    "posttest": "nyc report --reporter=lcov && nyc check-coverage --statements 95 --branches 95 --functions 90 --lines 95"
   },
   "publishConfig": {
     "registry": "http://registry.npmjs.org"
