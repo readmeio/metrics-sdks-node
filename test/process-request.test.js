@@ -97,13 +97,16 @@ describe('processRequest()', () => {
       .set('a', '1')
       .expect(({ body }) => {
         assert(body.headers.find(header => header.name === 'host').value.match(/127.0.0.1:\d+/));
-        assert.deepEqual(body.headers.filter(header => header.name !== 'host'), [
-          { name: 'accept-encoding', value: 'gzip, deflate' },
-          { name: 'user-agent', value: 'node-superagent/3.8.3' },
-          { name: 'a', value: '1' },
-          { name: 'connection', value: 'close' },
-          { name: 'content-length', value: '0' },
-        ]);
+        assert.deepEqual(
+          body.headers.filter(header => header.name !== 'host'),
+          [
+            { name: 'accept-encoding', value: 'gzip, deflate' },
+            { name: 'user-agent', value: 'node-superagent/3.8.3' },
+            { name: 'a', value: '1' },
+            { name: 'connection', value: 'close' },
+            { name: 'content-length', value: '0' },
+          ],
+        );
       }));
 
   it('#queryString', () =>
@@ -111,7 +114,10 @@ describe('processRequest()', () => {
       .post('/')
       .query({ a: 'b', c: 'd' })
       .expect(({ body }) =>
-        assert.deepEqual(body.queryString, [{ name: 'a', value: 'b' }, { name: 'c', value: 'd' }]),
+        assert.deepEqual(body.queryString, [
+          { name: 'a', value: 'b' },
+          { name: 'c', value: 'd' },
+        ]),
       ));
 
   describe('#postData', () => {

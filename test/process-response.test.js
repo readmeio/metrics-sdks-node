@@ -14,7 +14,7 @@ function testResponse(assertion, response) {
 
     // This is done in the main middleware by
     // overwriting res.write/end
-    res._body = response; // eslint-disable-line no-underscore-dangle
+    res._body = response;
 
     res.json(response);
   });
@@ -73,13 +73,16 @@ describe('processResponse()', () => {
 
   it('#headers', done => {
     testResponse(res => {
-      assert.deepEqual(processResponse(res).headers.filter(header => header.name !== 'date'), [
-        { name: 'x-powered-by', value: 'Express' },
-        {
-          name: 'content-type',
-          value: 'application/json; charset=utf-8',
-        },
-      ]);
+      assert.deepEqual(
+        processResponse(res).headers.filter(header => header.name !== 'date'),
+        [
+          { name: 'x-powered-by', value: 'Express' },
+          {
+            name: 'content-type',
+            value: 'application/json; charset=utf-8',
+          },
+        ],
+      );
       return done();
     });
   });

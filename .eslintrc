@@ -1,6 +1,15 @@
 {
-  "extends": ["airbnb-base", "prettier"],
+  "extends": "@readme/eslint-config",
   "rules": {
+    "no-underscore-dangle": ["error", {
+      "allow": ["_body"]
+    }],
 
+    "node/no-deprecated-api": ["error", {
+      "ignoreModuleItems": [
+        "assert.equal",
+        "assert.deepEqual"
+      ]
+    }]
   }
 }
