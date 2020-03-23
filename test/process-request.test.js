@@ -109,6 +109,63 @@ describe('processRequest()', () => {
           });
       });
     });
+
+    describe('blacklist/whitelist in body and headers', () => {
+      it('should strip blacklisted properties in body and headers', () => {
+        const app = createApp({
+          blacklist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
+        });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'content-type', value: 'application/json' },
+              { name: 'a', value: '1' },
+            ]);
+            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+          });
+      });
+
+      it('should only send whitelisted nested properties in body and headers', () => {
+        const app = createApp({
+          whitelist: ['a', 'another', 'content-type'],
+        });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'a', value: '1' },
+              { name: 'content-type', value: 'application/json' },
+            ]);
+            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+          });
+      });
+
+      it('should ignore whitelist if there are blacklisted properties in headers and body', () => {
+        const app = createApp({
+          blacklist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
+          whitelist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
+        });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'content-type', value: 'application/json' },
+              { name: 'a', value: '1' },
+            ]);
+            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+          });
+      });
+    });
   });
 
   it('#method', () =>

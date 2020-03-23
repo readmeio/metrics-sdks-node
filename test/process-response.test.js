@@ -91,6 +91,42 @@ describe('processResponse()', () => {
       });
     });
 
+    describe('blacklist/whitelist in headers and body', () => {
+      it('should strip blacklisted properties in headers and body', () => {
+        expect.hasAssertions();
+        return testResponse(res => {
+          const processed = processResponse(res, {
+            blacklist: ['content-length', 'etag', 'content-type', 'password', 'apiKey'],
+          });
+          expect(processed.headers).toStrictEqual([{ name: 'x-powered-by', value: 'Express' }]);
+          expect(processed.content.text).toStrictEqual(JSON.stringify({ another: 'Hello world' }));
+        }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
+      });
+
+      it('should whitelist properties in headers and body', () => {
+        expect.hasAssertions();
+        return testResponse(res => {
+          const processed = processResponse(res, {
+            whitelist: ['x-powered-by', 'another'],
+          });
+          expect(processed.headers).toStrictEqual([{ name: 'x-powered-by', value: 'Express' }]);
+          expect(processed.content.text).toStrictEqual(JSON.stringify({ another: 'Hello world' }));
+        }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
+      });
+
+      it('should ignore whitelist if there are blacklisted properties in headers and body', () => {
+        expect.hasAssertions();
+        return testResponse(res => {
+          const processed = processResponse(res, {
+            blacklist: ['content-length', 'etag', 'content-type', 'password', 'apiKey'],
+            whitelist: ['content-length', 'etag', 'content-type', 'password', 'apiKey'],
+          });
+          expect(processed.headers).toStrictEqual([{ name: 'x-powered-by', value: 'Express' }]);
+          expect(processed.content.text).toStrictEqual(JSON.stringify({ another: 'Hello world' }));
+        }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
+      });
+    });
+
     it('should not be applied for plain text bodies', () => {
       expect.hasAssertions();
       const body = 'hello world: dasdsas';
