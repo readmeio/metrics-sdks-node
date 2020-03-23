@@ -25,7 +25,7 @@ describe('processRequest()', () => {
   describe('options', () => {
     describe('blacklist/whitelist in body', () => {
       it('should strip blacklisted properties', () => {
-        const app = createApp({ blacklist: { body: ['password', 'apiKey'] } });
+        const app = createApp({ blacklist: ['password', 'apiKey'] });
 
         return request(app)
           .post('/')
@@ -36,7 +36,7 @@ describe('processRequest()', () => {
       });
 
       it('should strip blacklisted nested properties', () => {
-        const app = createApp({ blacklist: { body: ['a.b.c'] } });
+        const app = createApp({ blacklist: ['a.b.c'] });
 
         return request(app)
           .post('/')
@@ -47,7 +47,7 @@ describe('processRequest()', () => {
       });
 
       it('should only send whitelisted properties', () => {
-        const app = createApp({ whitelist: { body: ['password', 'apiKey'] } });
+        const app = createApp({ whitelist: ['password', 'apiKey'] });
 
         return request(app)
           .post('/')
@@ -61,7 +61,7 @@ describe('processRequest()', () => {
       });
 
       it('should only send whitelisted nested properties', () => {
-        const app = createApp({ whitelist: { body: ['a.b.c'] } });
+        const app = createApp({ whitelist: ['a.b.c'] });
 
         return request(app)
           .post('/')
@@ -74,7 +74,7 @@ describe('processRequest()', () => {
 
     describe('blacklist/whitelist in headers', () => {
       it('should strip blacklisted properties', () => {
-        const app = createApp({ blacklist: { headers: ['host', 'accept-encoding', 'user-agent', 'connection'] } });
+        const app = createApp({ blacklist: ['host', 'accept-encoding', 'user-agent', 'connection'] });
 
         return request(app)
           .post('/')
@@ -88,7 +88,7 @@ describe('processRequest()', () => {
       });
 
       it('should only send whitelisted properties', () => {
-        const app = createApp({ whitelist: { headers: ['a'] } });
+        const app = createApp({ whitelist: ['a'] });
 
         return request(app)
           .post('/')

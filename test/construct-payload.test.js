@@ -24,7 +24,7 @@ function createApp(options, existingPayload = { startedDateTime: new Date() }) {
 
 describe('constructPayload()', () => {
   it('should construct a har file from the request/response', () => {
-    return request(createApp({ blacklist: { body: ['password'] } }))
+    return request(createApp({ blacklist:['password'] }))
       .post('/')
       .send({ password: '123456' })
       .expect(({ body }) => {

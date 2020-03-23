@@ -28,7 +28,7 @@ describe('processResponse()', () => {
       it('should strip blacklisted properties in body', () => {
         expect.hasAssertions();
         return testResponse(res => {
-          expect(processResponse(res, { blacklist: { body: ['password', 'apiKey'] } }).content.text).toStrictEqual(
+          expect(processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text).toStrictEqual(
             JSON.stringify({ another: 'Hello world' })
           );
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
@@ -37,7 +37,7 @@ describe('processResponse()', () => {
       it('should strip blacklisted nested properties in body', () => {
         expect.hasAssertions();
         return testResponse(res => {
-          expect(processResponse(res, { blacklist: { body: ['a.b.c'] } }).content.text).toStrictEqual(
+          expect(processResponse(res, { blacklist: ['a.b.c'] }).content.text).toStrictEqual(
             JSON.stringify({ a: { b: {} } })
           );
         }, JSON.stringify({ a: { b: { c: 1 } } }));
@@ -46,7 +46,7 @@ describe('processResponse()', () => {
       it('should only send whitelisted properties in body', () => {
         expect.hasAssertions();
         return testResponse(res => {
-          expect(processResponse(res, { whitelist: { body: ['password', 'apiKey'] } }).content.text).toStrictEqual(
+          expect(processResponse(res, { whitelist: ['password', 'apiKey'] }).content.text).toStrictEqual(
             JSON.stringify({ password: '123456', apiKey: 'abcdef' })
           );
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
@@ -55,7 +55,7 @@ describe('processResponse()', () => {
       it('should only send whitelisted nested properties in body', () => {
         expect.hasAssertions();
         return testResponse(res => {
-          expect(processResponse(res, { whitelist: { body: ['a.b.c'] } }).content.text).toStrictEqual(
+          expect(processResponse(res, { whitelist: ['a.b.c'] }).content.text).toStrictEqual(
             JSON.stringify({ a: { b: { c: 1 } } })
           );
         }, JSON.stringify({ a: { b: { c: 1 } }, d: 2 }));
@@ -67,7 +67,7 @@ describe('processResponse()', () => {
         expect.hasAssertions();
         return testResponse(res => {
           expect(
-            processResponse(res, { blacklist: { headers: ['content-length', 'etag', 'content-type'] } }).headers
+            processResponse(res, { blacklist: ['content-length', 'etag', 'content-type'] }).headers
           ).toStrictEqual([{ name: 'x-powered-by', value: 'Express' }]);
         });
       });
@@ -75,7 +75,7 @@ describe('processResponse()', () => {
       it('should only send whitelisted properties in headers', () => {
         expect.hasAssertions();
         return testResponse(res => {
-          expect(processResponse(res, { whitelist: { headers: ['x-powered-by'] } }).headers).toStrictEqual([
+          expect(processResponse(res, { whitelist: ['x-powered-by'] }).headers).toStrictEqual([
             { name: 'x-powered-by', value: 'Express' },
           ]);
         });
