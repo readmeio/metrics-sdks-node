@@ -30,7 +30,7 @@
     "url": "git@github.com:readmeio/readme-node.git"
   },
   "devDependencies": {
-    "@readme/eslint-config": "^1.4.2",
+    "@readme/eslint-config": "^2.0.0",
     "body-parser": "^1.19.0",
     "conventional-changelog-cli": "^2.0.31",
     "eslint": "^6.7.0",
