@@ -30,7 +30,7 @@ View full documentation here: [https://docs.readme.com/docs/sending-logs-to-read
 
 
 ### Limitations
-- Currently only supports JSON. Adding a whitelist/blacklist for non-JSON bodies will not work (unless they're added to `req.body`)
+- Currently only supports JSON. Adding a whitelist/blacklist for non-JSON bodies will not work (unless they're added to `req.body` and `req.headers`)
 the same way that `body-parser` does it. The properties will be converted to JSON in the HAR format.
 - Needs more support for getting URLs when behind a reverse proxy: `x-forwarded-for`, `x-forwarded-proto`, etc.
 - Needs more support for getting client IP address when behind a reverse proxy.
