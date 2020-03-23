@@ -70,6 +70,17 @@ describe('processRequest()', () => {
             expect(body.postData.params).toStrictEqual([{ name: 'a', value: { b: { c: 1 } } }]);
           });
       });
+
+      it('should ignore whitelist if blacklist is present', () => {
+        const app = createApp({ blacklist: ['password', 'apiKey'], whitelist: ['password', 'apiKey'] });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .expect(({ body }) => {
+            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+          });
+      });
     });
 
     describe('blacklist/whitelist in headers', () => {

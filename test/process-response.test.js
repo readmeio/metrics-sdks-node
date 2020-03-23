@@ -60,6 +60,15 @@ describe('processResponse()', () => {
           );
         }, JSON.stringify({ a: { b: { c: 1 } }, d: 2 }));
       });
+
+      it('should ignore whitelist if blacklist is present', () => {
+        expect.hasAssertions();
+        return testResponse(res => {
+          expect(
+            processResponse(res, { blacklist: ['password', 'apiKey'], whitelist: ['password', 'apiKey'] }).content.text
+          ).toStrictEqual(JSON.stringify({ another: 'Hello world' }));
+        }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
+      });
     });
 
     describe('blacklist/whitelist in headers', () => {
