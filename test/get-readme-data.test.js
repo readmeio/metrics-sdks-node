@@ -1,5 +1,5 @@
 const nock = require('nock');
-const config = require('config');
+const config = require('../config');
 const getReadmeData = require('../lib/get-readme-data');
 
 describe('#get-readme-data', () => {
