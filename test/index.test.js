@@ -1,7 +1,7 @@
 const express = require('express');
 const request = require('supertest');
 const nock = require('nock');
-const config = require('../config');
+const config = require('config');
 
 const middleware = require('..');
 
