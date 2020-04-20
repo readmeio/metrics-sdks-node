@@ -255,14 +255,6 @@ describe('processRequest()', () => {
           .send('a=1&b=2')
           .expect(res => expect(res.body.postData.mimeType).toBe('application/x-www-form-urlencoded'));
       });
-
-      it('#text should be JSON-stringified body', () => {
-        return request(createApp())
-          .post('/')
-          .set({ name: 'content-type', value: 'application/x-www-form-urlencoded' })
-          .send('a=1&b=2')
-          .expect(res => expect(res.body.postData.text).toBe('{"a":"1","b":"2"}'));
-      });
     });
 
     it('#mimeType should default to application/json', () =>
@@ -281,14 +273,6 @@ describe('processRequest()', () => {
             { name: 'b', value: 2 },
           ])
         );
-    });
-
-    it('#text should be JSON-stringified body', () => {
-      const body = { a: 1, b: 2 };
-      return request(createApp())
-        .post('/')
-        .send(body)
-        .expect(res => expect(res.body.postData.text).toBe('{"a":1,"b":2}'));
     });
   });
 });

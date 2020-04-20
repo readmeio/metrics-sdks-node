@@ -30,8 +30,7 @@ View full documentation here: [https://docs.readme.com/docs/sending-logs-to-read
 
 
 ### Limitations
-- Currently only supports JSON request bodies. Adding a whitelist/blacklist for non-JSON bodies will not work (unless they're added to `req.body`)
-the same way that `body-parser` does it. The properties will be passed into the HAR `postData` as both JSON-stringified `text` and a HAR-formatted `params` array. See [here](https://bugs.chromium.org/p/chromium/issues/detail?id=1049080#c6) for info on why both `params` and `text` are being delivered.
+- Currently only supports JSON request bodies. Adding a whitelist/blacklist for non-JSON bodies will not work (unless they're added to `req.body`) the same way that `body-parser` does it. The properties will be passed into [`postData`](http://www.softwareishard.com/blog/har-12-spec/#postData) as a `params` array.
 - Needs more support for getting URLs when behind a reverse proxy: `x-forwarded-for`, `x-forwarded-proto`, etc.
 - Needs more support for getting client IP address when behind a reverse proxy.
 - Logs are "fire and forget" to the metrics server, so any failed requests (even for incorrect API key!) will currently fail silently.
